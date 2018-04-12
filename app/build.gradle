@@ -7,8 +7,8 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 26
     defaultConfig {
-        //   applicationId "test.test.test.test"
-        applicationId "mag.spike.tabs"
+         applicationId "test.test.test.test"
+        //   applicationId "mag.spike.tabs"
         minSdkVersion 15
         multiDexEnabled true
         targetSdkVersion 26

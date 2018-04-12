@@ -26,7 +26,7 @@ import com.applovin.sdk.AppLovinSdkSettings;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    Button btnShowInterstitial;
+    Button btnShowInterstitial, btnShowVideo;
 
     /*       APPLOVIN     */
     AppLovinSdk appLovinSdk;
@@ -44,13 +44,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         btnShowInterstitial = (Button) findViewById(R.id.btnShowInterstitial);
+        btnShowVideo  = (Button) findViewById(R.id.btnShowVideo);
+        btnShowVideo.setOnClickListener(v-> {showVideo();});
 
         btnShowInterstitial.setOnClickListener(v -> {
             showInterstitial();
         });
 
         initializeApplovin();
-
+     //   loadVideo();
     }
 
     private void initializeApplovin() {
@@ -66,9 +68,6 @@ public class MainActivity extends AppCompatActivity {
         myIncent.preload(mAdLoadListener);
 
         appLovinAdDialog = AppLovinInterstitialAd.create(appLovinSdk, this);
-
-        //   loadInterstitial();
-
     }
 
     private void initListeners() {
@@ -128,6 +127,24 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
+
+    }
+    private void loadVideo(){
+        myIncent.preload(mAdLoadListener);
+    }
+    private void showVideo(){
+        myIncent.show(this, mAdRewardListener, null, new AppLovinAdDisplayListener(){
+            @Override
+            public void adDisplayed(AppLovinAd appLovinAd) {
+                Log.d("AppLovinDebug", "adDisplayed: ");
+            }
+
+            @Override
+            public void adHidden(AppLovinAd appLovinAd) {
+                loadVideo();
+            }
+        });
+
 
     }
 
