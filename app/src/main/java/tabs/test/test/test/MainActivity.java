@@ -1,16 +1,16 @@
 package tabs.test.test.test;
 
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.applovin.adview.AppLovinAdView;
 import com.applovin.adview.AppLovinIncentivizedInterstitial;
 import com.applovin.adview.AppLovinInterstitialAd;
 import com.applovin.adview.AppLovinInterstitialAdDialog;
@@ -19,17 +19,17 @@ import com.applovin.sdk.AppLovinAdDisplayListener;
 import com.applovin.sdk.AppLovinAdLoadListener;
 import com.applovin.sdk.AppLovinAdRewardListener;
 import com.applovin.sdk.AppLovinAdSize;
-import com.applovin.sdk.AppLovinErrorCodes;
 import com.applovin.sdk.AppLovinSdk;
 import com.applovin.sdk.AppLovinSdkSettings;
 
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    Button btnShowInterstitial, btnShowVideo;
+    Button btnNextBanner;
 
     /*       APPLOVIN     */
     AppLovinSdk appLovinSdk;
+    AppLovinAdView adView;
     AppLovinAdLoadListener mAdLoadListener;
     AppLovinAdRewardListener mAdRewardListener;
     AppLovinAdDisplayListener mAdDisplayListener;
@@ -42,17 +42,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        btnShowInterstitial = (Button) findViewById(R.id.btnShowInterstitial);
-        btnShowVideo  = (Button) findViewById(R.id.btnShowVideo);
-        btnShowVideo.setOnClickListener(v-> {showVideo();});
-
-        btnShowInterstitial.setOnClickListener(v -> {
-            showInterstitial();
+        btnNextBanner = (Button) findViewById(R.id.btnNextBanner);
+        btnNextBanner.setOnClickListener(v -> {
+            adView.loadNextAd();
         });
 
         initializeApplovin();
-     //   loadVideo();
+
+        init();
+
     }
 
     private void initializeApplovin() {
@@ -69,6 +67,54 @@ public class MainActivity extends AppCompatActivity {
 
         appLovinAdDialog = AppLovinInterstitialAd.create(appLovinSdk, this);
     }
+
+    private void loadBannder() {
+
+        adView = new AppLovinAdView(appLovinSdk, AppLovinAdSize.BANNER, this);
+
+        adView.setAdLoadListener(new AppLovinAdLoadListener() {
+            @Override
+            public void adReceived(AppLovinAd appLovinAd) {
+
+
+//                new Handler().postDelayed(() -> {
+//                            adView.destroy();
+//                            loadBannder();
+
+                            //    adView.loadNextAd();
+//                        }
+//                        , 120 * 1000);
+            }
+
+            @Override
+            public void failedToReceiveAd(int i) {
+                Log.d("Log.d", "AppLovin banner failed load - " + i);
+                new Handler().postDelayed(() -> adView.loadNextAd(), 5 * 1000);
+
+            }
+        });
+
+        adView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, com.applovin.sdk.AppLovinSdkUtils.dpToPx(this, AppLovinAdSize.BANNER.getHeight())));
+
+        final ViewGroup rootView = (ViewGroup) findViewById(R.id.bannerFrame);
+
+        rootView.addView(adView);
+
+        adView.loadNextAd();
+        // Load an ad!
+    }
+
+    private void onResumeBanner() {
+        Log.d("Log.d", "AppLovin banner  adView.resume()");
+        adView.resume();
+    }
+
+    private void pauseBanner() {
+
+        adView.pause();
+
+    }
+
 
     private void initListeners() {
         mAdLoadListener = new AppLovinAdLoadListener() {
@@ -129,11 +175,13 @@ public class MainActivity extends AppCompatActivity {
         };
 
     }
-    private void loadVideo(){
+
+    private void loadVideo() {
         myIncent.preload(mAdLoadListener);
     }
-    private void showVideo(){
-        myIncent.show(this, mAdRewardListener, null, new AppLovinAdDisplayListener(){
+
+    private void showVideo() {
+        myIncent.show(this, mAdRewardListener, null, new AppLovinAdDisplayListener() {
             @Override
             public void adDisplayed(AppLovinAd appLovinAd) {
                 Log.d("AppLovinDebug", "adDisplayed: ");
@@ -141,18 +189,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void adHidden(AppLovinAd appLovinAd) {
-                loadVideo();
+                new Handler().postDelayed(() -> loadVideo(), 5000);
             }
         });
 
 
     }
 
-//    private void showVideo(){
-//        myIncent.show(this, mAdRewardListener, null, mAdDisplayListener);
-//    }
-//
-    private void showInterstitial(){
+    private void showInterstitial() {
         appLovinAdDialog.setAdDisplayListener(new AppLovinAdDisplayListener() {
             @Override
             public void adDisplayed(AppLovinAd appLovinAd) {
@@ -166,18 +210,10 @@ public class MainActivity extends AppCompatActivity {
         });
         appLovinAdDialog.showAndRender(appLovinAd);
     }
-//    private void loadInterstitial(){
-//        appLovinSdk.getAdService().loadNextAd(AppLovinAdSize.INTERSTITIAL, new AppLovinAdLoadListener() {
-//            @Override
-//            public void adReceived(AppLovinAd ad) {
-//               appLovinAd = ad;
-//            }
-//
-//            @Override
-//            public void failedToReceiveAd(int i) {
-//                Log.d("AppLovinDebug", "failed load interstitial: " + i);
-//            }
-//        });
-//
-//    }
+
+    protected void init() {
+        loadBannder();
+    }
 }
+
+
