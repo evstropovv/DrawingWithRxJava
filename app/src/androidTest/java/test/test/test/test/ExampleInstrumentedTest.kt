@@ -1,4 +1,4 @@
-package tabs.test.test.test
+package test.test.test.test
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getTargetContext()
-        assertEquals("tabs.spike.mag.freetaxi2", appContext.packageName)
+        assertEquals("test.spike.mag.freetaxi2", appContext.packageName)
     }
 }

@@ -1,4 +1,4 @@
-package tabs.test.test.test
+package test.test.test.test
 
 import org.junit.Test
 
